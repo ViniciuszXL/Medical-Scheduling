@@ -9,7 +9,6 @@ class Utilitaries {
   static SizedBox constructLogo(double widthAndHeight, String src) {
     SizedBox box = new SizedBox(
       width: widthAndHeight,
-      height: widthAndHeight,
       child: Image.asset(src),
     );
 
@@ -26,15 +25,10 @@ class Utilitaries {
     return outline;
   }
 
-  static TextFormField createForm(
-      bool autoFocus,
-      bool obscureText,
-      TextInputType type,
-      String text,
-      String hintText,
-      Color color,
-      IconData icon) {
+  static TextFormField createForm(bool autoFocus, bool obscureText, TextInputType type, String text,
+      String hintText, Color color, IconData icon) {
     TextFormField form = new TextFormField(
+      enableSuggestions: false,
       autofocus: autoFocus,
       keyboardType: type,
       obscureText: obscureText,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
+// Pages //
 import 'package:medical_scheduling/pages/Login/Login.dart';
+import 'package:medical_scheduling/pages/Registro/Registro.dart';
 
 void main() => runApp(App());
 
@@ -13,6 +16,10 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Login(),
+      routes: <String, WidgetBuilder>{
+        '/homePage': (context) => new Login(),
+        '/registerPage': (context) => new Registro(),
+      },
     );
 
     return app;

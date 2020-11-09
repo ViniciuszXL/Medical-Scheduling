@@ -1,5 +1,5 @@
 name: medical_scheduling
-description: A new Flutter project.
+description: Aplicativo de marcação de consulta para a disciplina de Computação para Dispositivos Móveis, utilizando Flutter, Dart e MariaDB.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
