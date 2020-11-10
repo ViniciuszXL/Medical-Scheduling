@@ -1,6 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+// Utilitaries //
 import 'package:medical_scheduling/pages/Utilitaries/Utilitaries.dart';
+import 'dart:convert';
+
+class RegistroResult {
+  final String result;
+  final String message;
+  final bool isSuccess;
+
+  RegistroResult({this.result, this.message, this.isSuccess});
+
+  factory RegistroResult.fromJson(Map<String, dynamic> json) {
+    return RegistroResult(
+        result: json['result'],
+        message: json['message'],
+        isSuccess: json['result'] == 'error' ? false : true);
+  }
+}
 
 class Registro extends StatefulWidget {
   @override
@@ -8,8 +29,7 @@ class Registro extends StatefulWidget {
 }
 
 class _RegistroState extends State<Registro> {
-  GlobalKey<FormState> _key = new GlobalKey();
-  bool _validate = false;
+  RegistroResult result;
   String email, name, cpf, senha;
   Color color = Colors.white;
 
@@ -18,31 +38,49 @@ class _RegistroState extends State<Registro> {
     Scaffold scaffold = new Scaffold(
       body: Container(
         padding: EdgeInsets.only(
-          top: 55,
+          top: 25,
           left: 40,
           right: 40,
         ),
         color: Colors.blue,
-        child: Form(
-          key: _key,
-          autovalidate: _validate,
-          child: formUI(),
-        ),
+        child: formUI(),
       ),
       resizeToAvoidBottomPadding: false,
     );
     return scaffold;
   }
 
+  Widget showNotification() {
+    if (result == null) return Utilitaries.constructSpace(20);
+
+    return Container(
+      height: 50,
+      margin: EdgeInsets.only(top: 10, bottom: 20),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: result.isSuccess ? Colors.green : Colors.red,
+        borderRadius: BorderRadius.circular(7.0),
+      ),
+      child: Text(
+        result.message,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
   Widget formUI() {
     return new Column(
       children: <Widget>[
-        Utilitaries.constructLogo(192, 'assets/logo/main.png'),
-        Utilitaries.constructSpace(20),
+        Utilitaries.constructLogo(128, 'assets/logo/main.png'),
+        showNotification(),
         TextFormField(
           autofocus: true,
           keyboardType: TextInputType.text,
-          obscureText: true,
           decoration: InputDecoration(
             labelText: 'Nome',
             hintText: 'Informe seu nome',
@@ -60,12 +98,9 @@ class _RegistroState extends State<Registro> {
               child: Icon(Icons.account_box_rounded, color: color),
             ),
           ),
-          validator: isNome,
-          onSaved: (String val) {
-            name = val;
-          },
           onChanged: (String val) {
             name = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
@@ -73,7 +108,6 @@ class _RegistroState extends State<Registro> {
         TextFormField(
           autofocus: true,
           keyboardType: TextInputType.text,
-          obscureText: true,
           decoration: InputDecoration(
             labelText: 'E-mail',
             hintText: 'Informe seu e-mail',
@@ -91,12 +125,9 @@ class _RegistroState extends State<Registro> {
               child: Icon(Icons.mail, color: color),
             ),
           ),
-          validator: isMail,
-          onSaved: (String val) {
-            email = val;
-          },
           onChanged: (String val) {
             email = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
@@ -104,9 +135,6 @@ class _RegistroState extends State<Registro> {
         TextFormField(
           autofocus: true,
           keyboardType: TextInputType.number,
-          obscureText: false,
-          enableSuggestions: false,
-          maxLength: 11,
           decoration: InputDecoration(
             labelText: 'CPF',
             hintText: 'Informe seu CPF',
@@ -124,12 +152,9 @@ class _RegistroState extends State<Registro> {
               child: Icon(Icons.perm_identity, color: color),
             ),
           ),
-          validator: isCPF,
-          onSaved: (String val) {
-            cpf = val;
-          },
           onChanged: (String val) {
             cpf = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
@@ -137,9 +162,8 @@ class _RegistroState extends State<Registro> {
         TextFormField(
           autofocus: true,
           keyboardType: TextInputType.text,
-          obscureText: false,
+          obscureText: true,
           enableSuggestions: false,
-          maxLength: 16,
           decoration: InputDecoration(
             labelText: 'Senha',
             hintText: 'Informe sua senha',
@@ -157,16 +181,13 @@ class _RegistroState extends State<Registro> {
               child: Icon(Icons.perm_identity, color: color),
             ),
           ),
-          validator: isSenha,
-          onSaved: (String val) {
-            senha = val;
-          },
           onChanged: (String val) {
             senha = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
-        Utilitaries.constructSpace(10),
+        Utilitaries.constructSpace(25),
         Container(
           height: 60,
           alignment: Alignment.centerLeft,
@@ -179,7 +200,8 @@ class _RegistroState extends State<Registro> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Registrar", style: TextStyle(color: Colors.blue, fontSize: 20)),
+                  Text("Registrar",
+                      style: TextStyle(color: Colors.blue, fontSize: 20)),
                   Icon(Icons.account_box, color: Colors.blue, size: 30),
                 ],
               ),
@@ -194,7 +216,8 @@ class _RegistroState extends State<Registro> {
             child: Text(
               "Você já possui uma conta? Logue-se!",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             onPressed: () {
               Navigator.pushNamed(context, '/homePage');
@@ -205,11 +228,13 @@ class _RegistroState extends State<Registro> {
     );
   }
 
-  String isNome(String value) {
-    String patttern = r'(^[a-zA-Z ]*$)';
-    RegExp regExp = new RegExp(patttern);
-    if (value.length == 0) return "Informe o nome";
-    if (!regExp.hasMatch(value)) return "O nome deve conter caracteres de a-z ou A-Z";
+  String isName(String value) {
+    String patttern = r'(^[0-9]*$)';
+    RegExp regExp = new RegExp(patttern,
+        caseSensitive: true, unicode: true, multiLine: true);
+    if (value == null || value.length == 0) return "Informe seu nome!";
+    if (regExp.hasMatch(value))
+      return "Nome informado está inválido! Só deve conter caracteres a-z ou A-Z";
     return null;
   }
 
@@ -217,36 +242,61 @@ class _RegistroState extends State<Registro> {
     String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regExp = new RegExp(pattern);
-    if (value.length == 0) return "Informe o Email";
-    if (!regExp.hasMatch(value)) return "Email inválido";
+    if (value == null || value.length == 0) return "Informe seu e-mail!";
+    if (!regExp.hasMatch(value)) return "E-mail informado é inválido!";
     return null;
   }
 
   String isCPF(String value) {
     String patttern = r'(^[0-9]*$)';
     RegExp regExp = new RegExp(patttern);
-    if (value.length == 0) return 'Informe seu CPF';
-    if (value.length != 11) return 'O CPF deve conter 11 números';
-    if (!regExp.hasMatch(value)) return 'O CPF só deve conter números';
+    if (value == null || value.length == 0) return 'Informe seu CPF!';
+    if (value.length != 11) return 'CPF deve conter 11 números!';
+    if (!regExp.hasMatch(value)) return 'CPF só deve conter números!';
     return null;
   }
 
   String isSenha(String value) {
-    if (value.length == 0) return 'Informe sua senha';
+    if (value == null || value.length == 0) return 'Informe sua senha!';
     if (value.length > 16) return 'Sua senha é maior que 16 caracteres!';
     if (value.length < 5) return 'Sua senha é menor que 5 caracteres!';
     return null;
   }
 
-  void register() {
-    if (_key.currentState.validate()) {
-      _key.currentState.save();
+  void register() async {
+    String valName = isName(name);
+    if (valName != null)
+      return setState(() => result = new RegistroResult(
+          result: 'error', message: valName, isSuccess: false));
 
-      // HTTP Request //
-    } else {
-      setState(() {
-        _validate = true;
-      });
-    }
+    String valEmail = isMail(email);
+    if (valEmail != null)
+      return setState(() => result = new RegistroResult(
+          result: 'error', message: valEmail, isSuccess: false));
+
+    print(cpf);
+    String valCPF = isCPF(cpf);
+    if (valCPF != null)
+      return setState(() => result = new RegistroResult(
+          result: 'error', message: valCPF, isSuccess: false));
+
+    String valSenha = isSenha(senha);
+    if (valSenha != null)
+      return setState(() => result = new RegistroResult(
+          result: 'error', message: valSenha, isSuccess: false));
+
+    String url = Utilitaries.buildRegisterUrl(name, email, cpf, senha);
+    print(url);
+    final response = await http.put(url);
+    final jsonDecode = await json.decode(response.body);
+    result = RegistroResult.fromJson(jsonDecode);
+    if (!result.isSuccess) return setState(() => result = result);
+
+    setState(() => result = new RegistroResult(
+        result: 'success',
+        message: 'Cadastro realizado com sucesso!',
+        isSuccess: true));
+    Timer.periodic(new Duration(seconds: 5),
+        (timer) => {Navigator.pushNamed(context, '/homePage'), timer.cancel()});
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Pages //
+import 'package:medical_scheduling/pages/Inicio/Inicio.dart';
 import 'package:medical_scheduling/pages/Login/Login.dart';
 import 'package:medical_scheduling/pages/Registro/Registro.dart';
 
@@ -17,6 +18,7 @@ class App extends StatelessWidget {
       ),
       home: Login(),
       routes: <String, WidgetBuilder>{
+        '/home': (context) => new Inicio(),
         '/homePage': (context) => new Login(),
         '/registerPage': (context) => new Registro(),
       },

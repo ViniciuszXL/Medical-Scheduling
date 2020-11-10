@@ -1,6 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+// Utilitaries //
 import 'package:medical_scheduling/pages/Utilitaries/Utilitaries.dart';
+import 'dart:convert';
+
+class LoginResult {
+  final String result;
+  final String message;
+  final bool isSuccess;
+
+  LoginResult({this.result, this.message, this.isSuccess});
+
+  factory LoginResult.fromJson(Map<String, dynamic> json) {
+    return LoginResult(
+        result: json['result'],
+        message: json['message'],
+        isSuccess: json['result'] == 'error' ? false : true);
+  }
+}
 
 class Login extends StatefulWidget {
   @override
@@ -9,6 +30,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   GlobalKey<FormState> _key = new GlobalKey();
+  LoginResult result;
   bool _validate = false;
   String cpf, senha;
   Color color = Colors.white;
@@ -18,7 +40,7 @@ class _LoginState extends State<Login> {
     Scaffold scaffold = new Scaffold(
       body: Container(
         padding: EdgeInsets.only(
-          top: 85,
+          top: 50,
           left: 40,
           right: 40,
         ),
@@ -34,11 +56,34 @@ class _LoginState extends State<Login> {
     return scaffold;
   }
 
+  Widget showNotification() {
+    if (result == null) return Utilitaries.constructSpace(30);
+
+    return Container(
+      height: 50,
+      margin: EdgeInsets.only(top: 10, bottom: 25),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: result.isSuccess ? Colors.green : Colors.red,
+        borderRadius: BorderRadius.circular(7.0),
+      ),
+      child: Text(
+        result.message,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
   Widget formUI() {
     return new Column(
       children: <Widget>[
-        Utilitaries.constructLogo(192, 'assets/logo/main.png'),
-        Utilitaries.constructSpace(35),
+        Utilitaries.constructLogo(160, 'assets/logo/main.png'),
+        showNotification(),
         TextFormField(
           autofocus: true,
           keyboardType: TextInputType.number,
@@ -63,11 +108,9 @@ class _LoginState extends State<Login> {
             ),
           ),
           validator: isCPF,
-          onSaved: (String val) {
-            cpf = val;
-          },
           onChanged: (String val) {
             cpf = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
@@ -95,11 +138,9 @@ class _LoginState extends State<Login> {
             ),
           ),
           validator: isSenha,
-          onSaved: (String val) {
-            senha = val;
-          },
           onChanged: (String val) {
             senha = val;
+            if (result != null) setState(() => result = null);
           },
           style: TextStyle(fontSize: 20, color: color),
         ),
@@ -109,7 +150,8 @@ class _LoginState extends State<Login> {
           child: FlatButton(
             child: Text(
               "Recuperar Senha",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             onPressed: () => {},
           ),
@@ -127,7 +169,8 @@ class _LoginState extends State<Login> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Entrar", style: TextStyle(color: Colors.blue, fontSize: 20)),
+                  Text("Entrar",
+                      style: TextStyle(color: Colors.blue, fontSize: 20)),
                   Icon(Icons.account_box, color: Colors.blue, size: 30),
                 ],
               ),
@@ -142,7 +185,8 @@ class _LoginState extends State<Login> {
             child: Text(
               "Não possui uma conta? Cadastre-se!",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             onPressed: () {
               Navigator.pushNamed(context, '/registerPage');
@@ -169,15 +213,21 @@ class _LoginState extends State<Login> {
     return null;
   }
 
-  void sendForm() {
-    if (_key.currentState.validate()) {
-      _key.currentState.save();
-
-      // HTTP Request //
-    } else {
-      setState(() {
-        _validate = true;
-      });
+  void sendForm() async {
+    if (!_key.currentState.validate()) {
+      setState(() => _validate = true);
+      return;
     }
+
+    _key.currentState.save();
+
+    String url = Utilitaries.buildLoginUrl(cpf, senha);
+    final response = await http.get(url);
+    final jsonDecode = await json.decode(response.body);
+    setState(() => result = LoginResult.fromJson(jsonDecode));
+
+    if (result.isSuccess)
+      Timer.periodic(new Duration(seconds: 3),
+          (timer) => {Navigator.pushNamed(context, '/home'), timer.cancel()});
   }
 }

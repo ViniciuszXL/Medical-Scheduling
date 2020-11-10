@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
 
 class Utilitaries {
+  static String urlApi = 'http://10.0.0.167:9090/';
+
+  static String buildRegisterUrl(
+      String name, String email, String cpf, String password) {
+    String initial = urlApi + 'register?name=' + name;
+    initial = initial + '&email=' + email;
+    initial = initial + '&cpf=' + cpf;
+    initial = initial + '&password=' + password;
+    return initial;
+  }
+
+  static String buildLoginUrl(String cpf, String password) {
+    String initial = urlApi + 'login?cpf=' + cpf;
+    initial = initial + '&password=' + password;
+    return initial;
+  }
+
   static SizedBox constructSpace(double size) {
     SizedBox box = new SizedBox(height: size);
     return box;
   }
 
-  static SizedBox constructLogo(double widthAndHeight, String src) {
+  static SizedBox constructLogo(double width, String src) {
     SizedBox box = new SizedBox(
-      width: widthAndHeight,
+      width: width,
       child: Image.asset(src),
     );
 
@@ -25,8 +42,14 @@ class Utilitaries {
     return outline;
   }
 
-  static TextFormField createForm(bool autoFocus, bool obscureText, TextInputType type, String text,
-      String hintText, Color color, IconData icon) {
+  static TextFormField createForm(
+      bool autoFocus,
+      bool obscureText,
+      TextInputType type,
+      String text,
+      String hintText,
+      Color color,
+      IconData icon) {
     TextFormField form = new TextFormField(
       enableSuggestions: false,
       autofocus: autoFocus,
