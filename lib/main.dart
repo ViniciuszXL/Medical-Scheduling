@@ -5,6 +5,10 @@ import 'package:medical_scheduling/pages/Inicio/Inicio.dart';
 import 'package:medical_scheduling/pages/Login/Login.dart';
 import 'package:medical_scheduling/pages/Registro/Registro.dart';
 
+// Consultas //
+import 'package:medical_scheduling/pages/Consultas/MarcarConsultas.dart';
+import 'package:medical_scheduling/pages/Consultas/ConsultasAgendadas.dart';
+
 void main() => runApp(App());
 
 class App extends StatelessWidget {
@@ -16,11 +20,13 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Login(),
+      home: Inicio(),
       routes: <String, WidgetBuilder>{
         '/home': (context) => new Inicio(),
         '/homePage': (context) => new Login(),
         '/registerPage': (context) => new Registro(),
+        '/marcarConsultas': (context) => new MarcarConsultas(),
+        '/consultasAgendadas': (context) => new ConsultasAgendadas(),
       },
     );
 

@@ -48,7 +48,13 @@ class _LoginState extends State<Login> {
         child: Form(
           key: _key,
           autovalidate: _validate,
-          child: formUI(),
+          child: ListView(
+            children: [
+              Container(
+                child: formUI(),
+              ),
+            ],
+          ),
         ),
       ),
       resizeToAvoidBottomPadding: false,

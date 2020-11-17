@@ -18,6 +18,22 @@ class Utilitaries {
     return initial;
   }
 
+  static AppBar createAppBar(bool returns, String title, double fontSize) {
+    AppBar appBar = AppBar(
+      automaticallyImplyLeading: returns,
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w700,
+          fontStyle: FontStyle.normal,
+          color: Colors.white,
+        ),
+      ),
+    );
+    return appBar;
+  }
+
   static SizedBox constructSpace(double size) {
     SizedBox box = new SizedBox(height: size);
     return box;
@@ -28,7 +44,6 @@ class Utilitaries {
       width: width,
       child: Image.asset(src),
     );
-
     return box;
   }
 

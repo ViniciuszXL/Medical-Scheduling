@@ -43,7 +43,13 @@ class _RegistroState extends State<Registro> {
           right: 40,
         ),
         color: Colors.blue,
-        child: formUI(),
+        child: ListView(
+          children: [
+            Container(
+              child: formUI(),
+            ),
+          ],
+        ),
       ),
       resizeToAvoidBottomPadding: false,
     );
