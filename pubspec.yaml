@@ -77,3 +77,9 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - assets/logo/main.png
+    - assets/specialists/Adalberto_Nascimento.jpg
+    - assets/specialists/Alberto_Costa.png
+    - assets/specialists/Cleiton_Neves.jpg
+    - assets/specialists/Francisco_Chaves.jpg
+    - assets/specialists/Júlio_Castro.jpg
+    - assets/specialists/Márcio_Araújo.jpg

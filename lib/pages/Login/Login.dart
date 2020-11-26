@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:medical_scheduling/pages/Inicio/Inicio.dart';
 
 // Utilitaries //
 import 'package:medical_scheduling/pages/Utilitaries/Utilitaries.dart';
@@ -12,14 +13,17 @@ class LoginResult {
   final String result;
   final String message;
   final bool isSuccess;
+  final String name;
 
-  LoginResult({this.result, this.message, this.isSuccess});
+  LoginResult({this.result, this.message, this.isSuccess, this.name});
 
   factory LoginResult.fromJson(Map<String, dynamic> json) {
     return LoginResult(
-        result: json['result'],
-        message: json['message'],
-        isSuccess: json['result'] == 'error' ? false : true);
+      result: json['result'],
+      message: json['message'],
+      isSuccess: json['result'] == 'error' ? false : true,
+      name: json['name'],
+    );
   }
 }
 
@@ -229,11 +233,14 @@ class _LoginState extends State<Login> {
 
     String url = Utilitaries.buildLoginUrl(cpf, senha);
     final response = await http.get(url);
-    final jsonDecode = await json.decode(response.body);
+    final jsonDecode = await json.decode(response.body)[0];
     setState(() => result = LoginResult.fromJson(jsonDecode));
 
-    if (result.isSuccess)
+    if (result.isSuccess) {
+      MaterialPageRoute route =
+          MaterialPageRoute(builder: (context) => Inicio(result.name));
       Timer.periodic(new Duration(seconds: 3),
-          (timer) => {Navigator.pushNamed(context, '/home'), timer.cancel()});
+          (timer) => {Navigator.push(context, route), timer.cancel()});
+    }
   }
 }

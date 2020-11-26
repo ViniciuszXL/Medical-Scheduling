@@ -5,8 +5,10 @@ import 'package:medical_scheduling/pages/Inicio/Inicio.dart';
 import 'package:medical_scheduling/pages/Login/Login.dart';
 import 'package:medical_scheduling/pages/Registro/Registro.dart';
 
+// Especialistas //
+import 'package:medical_scheduling/pages/Especialistas/Especialistas.dart';
+
 // Consultas //
-import 'package:medical_scheduling/pages/Consultas/MarcarConsultas.dart';
 import 'package:medical_scheduling/pages/Consultas/ConsultasAgendadas.dart';
 
 void main() => runApp(App());
@@ -20,12 +22,11 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Inicio(),
+      home: Inicio("Marcus Mendonça"),
       routes: <String, WidgetBuilder>{
-        '/home': (context) => new Inicio(),
         '/homePage': (context) => new Login(),
         '/registerPage': (context) => new Registro(),
-        '/marcarConsultas': (context) => new MarcarConsultas(),
+        '/especialistasPage': (context) => new Especialistas(),
         '/consultasAgendadas': (context) => new ConsultasAgendadas(),
       },
     );

@@ -1,65 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 // Utilitaries //
 import 'package:medical_scheduling/pages/Utilitaries/Utilitaries.dart';
+import 'dart:convert';
 
 class MarcarConsultas extends StatefulWidget {
+  String userName;
+
+  MarcarConsultas(this.userName);
+
   @override
-  _MarcarConsultasState createState() => _MarcarConsultasState();
+  _MarcarConsultasState createState() => _MarcarConsultasState(this.userName);
 }
 
 class _MarcarConsultasState extends State<MarcarConsultas> {
+  String userName;
+
+  // Clinicas //
+  String clinicSelected = 'Selecionar clinica';
+  List<String> clinicList;
+
   // Especialidades //
   String specialtySelected = 'Selecionar especialidade';
-  var _especialidades = [
-    'Selecionar especialidade',
-    'Urologista',
-    'Clínico Geral',
-    'Ultrasonografia',
-  ];
+  List<String> specialtyList;
+
+  // Doutores//
+  String doctorSelected = 'Nenhum doutor selecionado';
+  List<String> doctorList;
 
   // Dates //
   String dateSelected = 'Nenhuma data selecionada';
   var _dateList = [
     'Nenhuma data selecionada',
-    '10/11',
-    '11/11',
-    '12/11',
-    '13/11',
-    '14/11',
-    '15/11',
-    '16/11',
-    '17/11',
-    '18/11',
-    '19/11',
-    '20/11',
-    '21/11',
-    '22/11',
-    '23/11',
-    '24/11',
-    '25/11',
-    '26/11',
-    '27/11',
-    '28/11',
-    '29/11',
-    '30/11'
+    '10/12',
+    '11/12',
+    '12/12',
+    '13/12',
+    '14/12',
+    '15/12',
+    '16/12',
+    '17/12',
+    '18/12',
+    '19/12',
+    '20/12',
+    '21/12',
+    '22/12',
+    '23/12',
+    '24/12',
+    '25/12',
+    '26/12',
+    '27/12',
+    '28/12',
+    '29/12',
+    '30/12'
   ];
 
-  // Médicos por especialidades //
-  String doctorSelected = 'Nenhum doutor encontrado';
-  var _doctorList = ['Nenhum doutor encontrado'];
-  Map<String, List<String>> _doctorsPerSpecialty = new Map();
+  _MarcarConsultasState(String userName) {
+    this.userName = userName;
+    clinicList = new List<String>();
+    clinicList.add('Selecionar clinica');
+    searchClinics();
 
-  _MarcarConsultasState() {
-    _doctorsPerSpecialty.putIfAbsent(
-        'Urologista', () => ['Drº Francisco Chaves', 'Drº Márcio Araújo']);
+    specialtyList = new List<String>();
+    specialtyList.add('Selecionar especialidade');
 
-    _doctorsPerSpecialty.putIfAbsent('Clínico Geral',
-        () => ['Drº Cleiton Neves', 'Drº Adalberto Nascimento']);
-
-    _doctorsPerSpecialty.putIfAbsent(
-        'Ultrasonografia', () => ['Drº Júlio Castro', 'Drº Alberto Costa']);
+    doctorList = new List<String>();
+    doctorList.add('Nenhum doutor selecionado');
   }
 
   @override
@@ -82,12 +89,14 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
   Widget initialUI() {
     return Column(
       children: <Widget>[
+        clinicsUI(),
+        Utilitaries.constructSpace(10.0),
         specialtyUI(),
         Utilitaries.constructSpace(10.0),
-        doctorsPerSpecialtyUI(),
+        doctorsUI(),
         Utilitaries.constructSpace(10.0),
         showDate(),
-        Utilitaries.constructSpace(60.0),
+        Utilitaries.constructSpace(25.0),
         FlatButton(
           child: Container(
             alignment: Alignment.center,
@@ -130,7 +139,7 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
               ],
             ),
           ),
-          onPressed: () => {},
+          onPressed: () => createAppointment(),
         ),
         Utilitaries.constructSpace(15),
         FlatButton(
@@ -197,6 +206,40 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
     );
   }
 
+  Widget clinicsUI() {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          createContainer('Selecione a clínica'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: DropdownButton<String>(
+                    items: clinicList.map((String item) {
+                      return DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(
+                          item,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String novoItem) {
+                      selectClinic(novoItem);
+                    },
+                    value: clinicSelected),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget specialtyUI() {
     return Container(
       child: Column(
@@ -207,7 +250,7 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
             children: <Widget>[
               Container(
                 child: DropdownButton<String>(
-                  items: _especialidades.map((String item) {
+                  items: specialtyList.map((String item) {
                     return DropdownMenuItem<String>(
                       value: item,
                       child: Text(
@@ -232,7 +275,7 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
     );
   }
 
-  Widget doctorsPerSpecialtyUI() {
+  Widget doctorsUI() {
     return Container(
       child: Column(
         children: <Widget>[
@@ -244,7 +287,7 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
               Container(
                 margin: EdgeInsets.only(left: 25.0, right: 25.0),
                 child: DropdownButton<String>(
-                  items: _doctorList.map((String item) {
+                  items: doctorList.map((String item) {
                     return DropdownMenuItem<String>(
                       value: item,
                       child: Text(
@@ -306,13 +349,106 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
     );
   }
 
-  void delete() {
+  void searchClinics() async {
+    String url = Utilitaries.getUrl() + 'clinics';
+    final response = await http.get(url);
+    final jsonDecode = await json.decode(response.body);
+    if (Utilitaries.isError(jsonDecode)) ;
+
     setState(() {
-      this.specialtySelected = 'Selecionar especialidade';
-      this._doctorList = ['Nenhum doutor encontrado'];
-      this.doctorSelected = 'Nenhum doutor encontrado';
-      this.dateSelected = 'Nenhuma data selecionada';
+      for (int i = 0; i < jsonDecode.length; i++) {
+        final data = jsonDecode[i];
+        final name = data['name'];
+        if (!clinicList.contains(name)) {
+          clinicList.add(name);
+        }
+      }
     });
+  }
+
+  void selectClinic(String newClinic) {
+    setState(() => {
+          this.clinicSelected = newClinic,
+          searchSpecialty(newClinic),
+        });
+  }
+
+  void searchSpecialty(String clinicName) async {
+    String url = Utilitaries.getUrl() + 'clinics?name=' + clinicName;
+    final clinicResponse = await http.get(url);
+    final clinicDecode = await json.decode(clinicResponse.body);
+    if (Utilitaries.isError(clinicDecode)) return;
+
+    int clinicId = clinicDecode[0]['id'];
+    url = Utilitaries.getUrl() + 'specialty?clinicId=' + clinicId.toString();
+    final specialtyResponse = await http.get(url);
+    final specialtyDecode = await json.decode(specialtyResponse.body);
+    if (Utilitaries.isError(specialtyDecode)) return;
+
+    setState(() {
+      specialtyList.clear();
+      specialtyList.add('Selecionar especialidade');
+      for (int i = 0; i < specialtyDecode.length; i++) {
+        final data = specialtyDecode[i];
+        final name = data['specialty'];
+        if (!specialtyList.contains(name)) {
+          specialtyList.add(name);
+        }
+      }
+    });
+  }
+
+  void setSpecialty(String newSpecialty) {
+    setState(() => {
+          this.specialtySelected = newSpecialty,
+          searchDoctor(newSpecialty),
+        });
+  }
+
+  void searchDoctor(String specialty) async {
+    String url = Utilitaries.getUrl() + 'specialty?specialtyName=' + specialty;
+    final specialtyResponse = await http.get(url);
+    final specialtyDecode = await json.decode(specialtyResponse.body);
+    if (Utilitaries.isError(specialtyDecode)) return;
+
+    int specialtyId = specialtyDecode[0]['id'];
+    url =
+        Utilitaries.getUrl() + 'doctors?specialtyId=' + specialtyId.toString();
+    final doctorResponse = await http.get(url);
+    final doctorDecode = await json.decode(doctorResponse.body);
+    if (Utilitaries.isError(doctorDecode)) return;
+
+    setState(() {
+      doctorList.clear();
+      doctorList.add('Nenhum doutor selecionado');
+      for (int i = 0; i < doctorDecode.length; i++) {
+        final data = doctorDecode[i];
+        final name = data['name'];
+        if (!doctorList.contains(name)) {
+          doctorList.add(name);
+        }
+      }
+    });
+  }
+
+  void createAppointment() async {
+    String url =
+        Utilitaries.getUrl() + 'markappointment?time=' + this.dateSelected;
+    url += '&clinicName=' + this.clinicSelected;
+    url += '&userName=' + this.userName;
+    url += '&doctorName=' + this.doctorSelected;
+    print(url);
+    final response = await http.put(url);
+    final decode = await json.decode(response.body);
+    print(decode);
+    if (Utilitaries.isError(decode)) {
+      Utilitaries.createAlert(context, 'Ocorreu um erro', decode[0]['message']);
+      return;
+    }
+
+    String message = decode[0]['message'];
+    Utilitaries.createAlert(context, 'Sucesso!', message);
+    delete();
   }
 
   void setDate(String newDate) {
@@ -323,26 +459,18 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
     setState(() => {this.doctorSelected = newDoctor});
   }
 
-  void setSpecialty(String novoItem) {
-    setState(() => {
-          this.specialtySelected = novoItem,
-          this._doctorList = getDoctorsPerSpecialty()
-        });
-  }
+  void delete() {
+    setState(() {
+      this.clinicSelected = 'Selecionar clinica';
+      this.specialtySelected = 'Selecionar especialidade';
+      this.doctorSelected = 'Nenhum doutor selecionado';
+      this.dateSelected = 'Nenhuma data selecionada';
 
-  List<String> getDoctorsPerSpecialty() {
-    var _list = [specialtySelected];
-    if (specialtySelected.contains('Selecionar especialidade'))
-      _list = [doctorSelected];
+      this.specialtyList.clear();
+      this.specialtyList.add('Selecionar especialidade');
 
-    _doctorsPerSpecialty.forEach((key, value) {
-      if (key.contains(specialtySelected)) {
-        _list = ['Selecione um doutor'];
-        this.doctorSelected = 'Selecione um doutor';
-        value.forEach((element) => _list.add(element));
-      }
+      this.doctorList.clear();
+      this.doctorList.add('Nenhum doutor selecionado');
     });
-
-    return _list;
   }
 }

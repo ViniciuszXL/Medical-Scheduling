@@ -26,12 +26,14 @@ class ConsultasAgendadas extends StatelessWidget {
     return Column(
       children: <Widget>[
         Utilitaries.constructSpace(20),
-        create('18/11', 'Urologista', 'Drº Francisco Chaves',
-            'HAP Clínica Duque de Caxias'),
-        create('19/11', 'Clínico Geral', 'Drº Cleiton Neves',
-            'HAP Clínica Zona Leste'),
-        create('20/11', 'Ultrasonografia', 'Drº Júlio Castro',
-            'HAP Clínica Zona Leste')
+        Container(
+          child: Text(
+            "Não há consultas agendadas!",
+            style: TextStyle(
+              fontSize: 25,
+            ),
+          ),
+        ),
       ],
     );
   }

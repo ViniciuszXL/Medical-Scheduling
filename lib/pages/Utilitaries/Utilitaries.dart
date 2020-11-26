@@ -1,7 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Utilitaries {
   static String urlApi = 'http://10.0.0.167:9090/';
+
+  static String getUrl() {
+    return urlApi;
+  }
+
+  static void createAlert(BuildContext context, String title, String content) {
+    Widget okButton = FlatButton(
+      child: Text('Fechar'),
+      onPressed: () => Navigator.of(context, rootNavigator: true).pop('dialog'),
+    );
+
+    AlertDialog alerta = AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        okButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alerta;
+      },
+    );
+  }
+
+  static bool isError(final jsonDecode) {
+    String result = jsonDecode[0]['result'];
+    if (result != null && result == 'error') return true;
+    return false;
+  }
 
   static String buildRegisterUrl(
       String name, String email, String cpf, String password) {

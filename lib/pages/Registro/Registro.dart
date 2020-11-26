@@ -280,7 +280,6 @@ class _RegistroState extends State<Registro> {
       return setState(() => result = new RegistroResult(
           result: 'error', message: valEmail, isSuccess: false));
 
-    print(cpf);
     String valCPF = isCPF(cpf);
     if (valCPF != null)
       return setState(() => result = new RegistroResult(
@@ -292,9 +291,8 @@ class _RegistroState extends State<Registro> {
           result: 'error', message: valSenha, isSuccess: false));
 
     String url = Utilitaries.buildRegisterUrl(name, email, cpf, senha);
-    print(url);
-    final response = await http.put(url);
-    final jsonDecode = await json.decode(response.body);
+    final response = await http.post(url);
+    final jsonDecode = await json.decode(response.body)[0];
     result = RegistroResult.fromJson(jsonDecode);
     if (!result.isSuccess) return setState(() => result = result);
 
