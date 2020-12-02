@@ -199,7 +199,7 @@ class _LoginState extends State<Login> {
                   TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/registerPage');
+              Navigator.pushNamed(context, '/register');
             },
           ),
         ),

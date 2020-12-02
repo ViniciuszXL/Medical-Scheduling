@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 
 // Pages //
-import 'package:medical_scheduling/pages/Inicio/Inicio.dart';
 import 'package:medical_scheduling/pages/Login/Login.dart';
 import 'package:medical_scheduling/pages/Registro/Registro.dart';
-
-// Especialistas //
-import 'package:medical_scheduling/pages/Especialistas/Especialistas.dart';
-
-// Consultas //
-import 'package:medical_scheduling/pages/Consultas/ConsultasAgendadas.dart';
 
 void main() => runApp(App());
 
@@ -22,12 +15,10 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Inicio("Marcus Mendonça"),
+      home: Login(),
       routes: <String, WidgetBuilder>{
-        '/homePage': (context) => new Login(),
-        '/registerPage': (context) => new Registro(),
-        '/especialistasPage': (context) => new Especialistas(),
-        '/consultasAgendadas': (context) => new ConsultasAgendadas(),
+        '/login': (context) => new Login(),
+        '/register': (context) => new Registro(),
       },
     );
 

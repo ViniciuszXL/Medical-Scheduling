@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class Utilitaries {
   static String urlApi = 'http://10.0.0.167:9090/';
 

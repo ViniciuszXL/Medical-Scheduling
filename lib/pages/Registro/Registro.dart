@@ -226,7 +226,7 @@ class _RegistroState extends State<Registro> {
                   TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
             onPressed: () {
-              Navigator.pushNamed(context, '/homePage');
+              Navigator.pushNamed(context, '/login');
             },
           ),
         ),
@@ -301,6 +301,6 @@ class _RegistroState extends State<Registro> {
         message: 'Cadastro realizado com sucesso!',
         isSuccess: true));
     Timer.periodic(new Duration(seconds: 5),
-        (timer) => {Navigator.pushNamed(context, '/homePage'), timer.cancel()});
+        (timer) => {Navigator.pushNamed(context, '/login'), timer.cancel()});
   }
 }

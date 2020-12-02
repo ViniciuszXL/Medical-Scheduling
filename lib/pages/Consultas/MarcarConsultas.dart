@@ -216,22 +216,23 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
             children: <Widget>[
               Container(
                 child: DropdownButton<String>(
-                    items: clinicList.map((String item) {
-                      return DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                          ),
+                  items: clinicList.map((String item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(
+                        item,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (String novoItem) {
-                      selectClinic(novoItem);
-                    },
-                    value: clinicSelected),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String novoItem) {
+                    selectClinic(novoItem);
+                  },
+                  value: clinicSelected,
+                ),
               ),
             ],
           ),
@@ -437,18 +438,17 @@ class _MarcarConsultasState extends State<MarcarConsultas> {
     url += '&clinicName=' + this.clinicSelected;
     url += '&userName=' + this.userName;
     url += '&doctorName=' + this.doctorSelected;
-    print(url);
     final response = await http.put(url);
     final decode = await json.decode(response.body);
-    print(decode);
-    if (Utilitaries.isError(decode)) {
-      Utilitaries.createAlert(context, 'Ocorreu um erro', decode[0]['message']);
-      return;
-    }
+    String result = decode[0]['result'];
+    if (result == 'error')
+      return Utilitaries.createAlert(context, 'Erro!',
+          'Ocorreu um erro ao marcar sua consulta. Tente novamente mais tarde!');
 
     String message = decode[0]['message'];
-    Utilitaries.createAlert(context, 'Sucesso!', message);
-    delete();
+    Utilitaries.createAlert(
+        context, result == 'failed' ? 'Ocorreu um erro.' : 'Sucesso!', message);
+    if (result != 'failed') delete();
   }
 
   void setDate(String newDate) {

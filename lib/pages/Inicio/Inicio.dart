@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Pages //
+import 'package:medical_scheduling/pages/Consultas/ConsultasAgendadas.dart';
 import 'package:medical_scheduling/pages/Consultas/MarcarConsultas.dart';
 
 // Utilitaries //
@@ -140,7 +141,12 @@ class Inicio extends StatelessWidget {
                     ),
                   ],
                 ),
-                onPressed: () => {},
+                onPressed: () => {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConsultasAgendadas(this.name)))
+                },
               ),
             ),
           ],
